@@ -130,9 +130,8 @@ pip install dqu
 For development:
 
 ```bash
-git clone https://github.com/<your-org>/dqu.git
-cd dqu
-pip install -e .
+git clone https://github.com/keshavksingh/dqu
+
 ```
 
 ---
