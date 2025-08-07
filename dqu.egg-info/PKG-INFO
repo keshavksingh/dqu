@@ -1,0 +1,10 @@
+Metadata-Version: 2.1
+Name: dqu
+Version: 0.1.0
+Summary: dqu is a data quality assesement framework supporting Spark, Flink, Ray and Pandas dataframes that empowers data and machine learning data developers to perform data quality assessments. dqu provides the data quality tool you need with enterprise-grade reliability and flexibility for Flink, Microsoft Fabric, Microsoft Synapse, Microsoft Azure ML, Azure Databricks, Jupyter Notebook data and ML piplines on Ray for Python/PySpark/PyFlink environments.
+Author: Keshav Kant Singh
+Author-email: keshav_singh@hotmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+License-File: LICENSE
