@@ -56,6 +56,7 @@ class FlinkEngine(BaseEngine):
         failed_dicts = [row for row in all_dicts if tuple(row[col] for col in columns) in dup_keys]
         result = {
             "status": "Success" if not failed_dicts else "Failed",
+            "dqu_check_type": "duplicate_check",
             "dqu_total_count": len(all_dicts),
             "dqu_failed_count": len(failed_dicts),
             "dqu_passed_count": len(all_dicts) - len(failed_dicts),
@@ -82,6 +83,7 @@ class FlinkEngine(BaseEngine):
         ]
         result = {
             "status": "Success" if not failed_dicts else "Failed",
+            "dqu_check_type": "empty_check",
             "dqu_total_count": len(all_dicts),
             "dqu_failed_count": len(failed_dicts),
             "dqu_passed_count": len(all_dicts) - len(failed_dicts),
@@ -107,6 +109,7 @@ class FlinkEngine(BaseEngine):
         failed_dicts = [row for row in all_dicts if tuple(row[col] for col in columns) in dup_keys]
         result = {
             "status": "Success" if not failed_dicts else "Failed",
+            "dqu_check_type": "unique_check",
             "dqu_total_count": len(all_dicts),
             "dqu_failed_count": len(failed_dicts),
             "dqu_passed_count": len(all_dicts) - len(failed_dicts),
@@ -171,6 +174,7 @@ class FlinkEngine(BaseEngine):
         status = "Success" if not missing_columns and not mismatched_types else "Failed"
         result_dict = {
             "status": status,
+            "dqu_check_type": "schemavalidation_check",
             "missing_columns": missing_columns,
             "type_mismatches": mismatched_types,
             "dqu_total_count": len(collected),
@@ -195,6 +199,7 @@ class FlinkEngine(BaseEngine):
         failed = [row for row in collected if not regex.fullmatch(str(row[column]) or '')]
         result = {
             "status": "Success" if not failed else "Failed",
+            "dqu_check_type": "stringformat_check",
             "dqu_total_count": len(collected),
             "dqu_failed_count": len(failed),
             "dqu_passed_count": len(collected) - len(failed),
@@ -224,6 +229,7 @@ class FlinkEngine(BaseEngine):
 
         result = {
             "status": "Success" if not failed_rows else "Failed",
+            "dqu_check_type": "range_check",
              "column": column,
              "range": {
                  "min": min_val,
@@ -252,6 +258,7 @@ class FlinkEngine(BaseEngine):
         failed = [row for row in collected if row.get(column) not in allowed_set]
         result = {
             "status": "Success" if not failed else "Failed",
+            "dqu_check_type": "categoricalvalues_check",
             "allowed_values": allowed_values,
             "dqu_total_count": len(collected),
             "dqu_failed_count": len(failed),
@@ -270,6 +277,7 @@ class FlinkEngine(BaseEngine):
             status = "Failed"
         result = {
             "status": status,
+            "dqu_check_type": "rowcount_check",
             "dqu_total_count": total,
             "min_required": min_rows,
             "max_allowed": max_rows,
@@ -322,6 +330,7 @@ class FlinkEngine(BaseEngine):
 
         result = {
             "status": "Success" if passed else "Failed",
+            "dqu_check_type": "datafreshness_check",
             "column": column,
             "latest_timestamp": latest_ts.isoformat(),
             "cutoff_timestamp": cutoff_ts.isoformat(),
@@ -357,8 +366,10 @@ class FlinkEngine(BaseEngine):
         if column:
             col_index = self.columns.index(column)
             failed_rows = [dict(zip(self.columns, row)) for row in all_rows if not func(row[col_index])]
+            check = "custom_check_column"
         else:
             failed_rows = [dict(zip(self.columns, row)) for row in all_rows if not func(dict(zip(self.columns, row)))]
+            check = "custom_check_row"
 
         total_count = len(all_rows)
         failed_count = len(failed_rows)
@@ -366,6 +377,7 @@ class FlinkEngine(BaseEngine):
 
         result = {
             "status": "Success" if failed_count == 0 else "Failed",
+            "dqu_check_type": check,
             "column": column,
             "dqu_total_count": total_count,
             "dqu_failed_count": failed_count,
@@ -414,6 +426,7 @@ class FlinkEngine(BaseEngine):
 
             result_dict = {
                 "status": "Success" if passed else "Failed",
+                "dqu_check_type": "statisticaldistribution_check",
                 "mode": "feature_drift",
                 "column": column,
                 "dqu_drift_mean": drift_mean,
@@ -431,6 +444,7 @@ class FlinkEngine(BaseEngine):
         
         result = {
             "status": "Success" if not failed_rows else "Failed",
+            "dqu_check_type": check_type,
             "dqu_total_count": len(total_rows),
             "dqu_failed_count": len(failed_rows),
             "dqu_passed_count": len(total_rows) - len(failed_rows),
@@ -486,6 +500,7 @@ class FlinkEngine(BaseEngine):
 
         result = {
             "status": "Success" if failed_count == 0 else "Failed",
+            "dqu_check_type": "referentialintegrity_check",
             "dqu_total_count": total,
             "dqu_failed_count": failed_count,
             "dqu_passed_count": passed_count,
@@ -527,6 +542,7 @@ class FlinkEngine(BaseEngine):
 
         result_dict = {
             "status": status,
+            "dqu_check_type": "schemavalidation_check",
             "missing_columns": missing_columns,
             "type_mismatches": mismatched_types,
             "dqu_total_count": len(collected),

@@ -27,7 +27,7 @@ class RayEngine(BaseEngine):
         total = self.df.count()
         failed = duplicate_rows.count()
 
-        result = self._build_result(total, failed)
+        result = self._build_result("duplicate_check",total, failed)
         if evaluation == "advanced":
             return json.dumps(result, indent=2), duplicate_rows
         return json.dumps(result, indent=2)
@@ -42,7 +42,7 @@ class RayEngine(BaseEngine):
         )
         total = self.df.count()
         failed = empty_rows.count()
-        result = self._build_result(total, failed)
+        result = self._build_result("empty_check",total, failed)
         if evaluation == "advanced":
             return json.dumps(result, indent=2), empty_rows
         return json.dumps(result, indent=2)
@@ -66,7 +66,7 @@ class RayEngine(BaseEngine):
         failed_df = self.df.filter(lambda row: tuple(row[col] for col in columns) in dup_keys if dup_keys else False)
         total = self.df.count()
         failed = failed_df.count()
-        result = self._build_result(total, failed)
+        result = self._build_result("unique_check",total, failed)
         if evaluation == "advanced":
             return json.dumps(result, indent=2), failed_df
         return json.dumps(result, indent=2)
@@ -105,7 +105,7 @@ class RayEngine(BaseEngine):
         failed_df = self.df.filter(check_row)
         total = self.df.count()
         failed = failed_df.count()
-        result = self._build_result(total, failed)
+        result = self._build_result("dtype_check",total, failed)
         if evaluation == "advanced":
             return json.dumps(result, indent=2), failed_df
         return json.dumps(result, indent=2)
@@ -120,7 +120,7 @@ class RayEngine(BaseEngine):
         failed_df = self.df.filter(lambda row: not (min_val <= row[column] <= max_val))
         total = self.df.count()
         failed = failed_df.count()
-        result = self._build_result(total, failed)
+        result = self._build_result("range_check",total, failed)
         result["column"] = column
         result["range"] = {"min": min_val, "max": max_val}
         if evaluation == "advanced":
@@ -138,7 +138,7 @@ class RayEngine(BaseEngine):
         failed_df = self.df.filter(lambda row: not regex.fullmatch(str(row[column]) or ''))
         total = self.df.count()
         failed = failed_df.count()
-        result = self._build_result(total, failed)
+        result = self._build_result("stringformat_check",total, failed)
         if evaluation == "advanced":
             return json.dumps(result, indent=2), failed_df
         return json.dumps(result, indent=2)
@@ -153,7 +153,7 @@ class RayEngine(BaseEngine):
         failed_df = self.df.filter(lambda row: row[column] not in allowed_set)
         total = self.df.count()
         failed = failed_df.count()
-        result = self._build_result(total, failed)
+        result = self._build_result("categoricalvalues_check",total, failed)
         result["allowed_values"] = allowed_values
         if evaluation == "advanced":
             return json.dumps(result, indent=2), failed_df
@@ -170,6 +170,7 @@ class RayEngine(BaseEngine):
             status = "Failed"
         result = {
             "status": status,
+            "dqu_check_type": "rowcount_check",
             "dqu_total_count": total,
             "min_required": min_rows,
             "max_allowed": max_rows,
@@ -200,14 +201,17 @@ class RayEngine(BaseEngine):
 
         if column:
             failed_df = self.df.filter(lambda row: not expression(row[column]))
+            check = "custom_check_column"
         else:
             failed_df = self.df.filter(lambda row: not expression(row))
+            check = "custom_check_row"
 
         total = self.df.count()
         failed = failed_df.count()
 
         result = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": check,
             "column": column,
             "dqu_total_count": total,
             "dqu_failed_count": failed,
@@ -267,6 +271,7 @@ class RayEngine(BaseEngine):
 
         result = {
             "status": "Success" if passed else "Failed",
+            "dqu_check_type": "datafreshness_check",
             "column": column,
             "latest_timestamp": str(latest_ts),
             "cutoff_timestamp": str(cutoff_ts),
@@ -278,9 +283,10 @@ class RayEngine(BaseEngine):
         return json.dumps(result, indent=2)
 
 
-    def _build_result(self, total: int, failed: int) -> Dict[str, Any]:
+    def _build_result(self,check: str, total: int, failed: int) -> Dict[str, Any]:
         return {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": check,
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,
@@ -331,6 +337,7 @@ class RayEngine(BaseEngine):
 
             result_dict = {
                 "status": "Success" if passed else "Failed",
+                "dqu_check_type": "statisticaldistribution_check",
                 "mode": "feature_drift",
                 "column": column,
                 "dqu_drift_mean": float(drift_mean),
@@ -349,6 +356,7 @@ class RayEngine(BaseEngine):
 
             result_dict = {
                 "status": "Success" if passed else "Failed",
+                "dqu_check_type": "statisticaldistribution_check",
                 "mode": "label_balance",
                 "column": column,
                 "dqu_distribution": counts,
@@ -387,6 +395,7 @@ class RayEngine(BaseEngine):
 
         result_dict = {
             "status": status,
+            "dqu_check_type": "schemavalidation_check",
             "missing_columns": missing_columns,
             "type_mismatches": mismatched_types,
             "dqu_total_count": self.df.count(),
@@ -431,6 +440,8 @@ class RayEngine(BaseEngine):
 
         result = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": "referentialintegrity_check",
+            "column": column,
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,

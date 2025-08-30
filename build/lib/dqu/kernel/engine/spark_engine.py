@@ -27,6 +27,7 @@ class SparkEngine(BaseEngine):
         failed = duplicates.count()
         result_dict = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": "duplicate_check",
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,
@@ -55,6 +56,7 @@ class SparkEngine(BaseEngine):
         failed = empty_rows.count()
         result_dict = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": "empty_check",
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,
@@ -82,6 +84,7 @@ class SparkEngine(BaseEngine):
         failed = non_unique.count()
         result_dict = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": "unique_check",
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,
@@ -147,6 +150,7 @@ class SparkEngine(BaseEngine):
         failed = failed_df.count() if failed_df is not None else 0
         result_dict = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": "dtype_check",
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,
@@ -188,6 +192,7 @@ class SparkEngine(BaseEngine):
 
         result_dict = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": "stringformat_check",
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,
@@ -252,6 +257,7 @@ class SparkEngine(BaseEngine):
 
         result_dict = {
             "status": status,
+            "dqu_check_type": "schemavalidation_check",
             "missing_columns": missing_columns,
             "type_mismatches": mismatched_types,
             "dqu_total_count": df.count(),
@@ -293,6 +299,7 @@ class SparkEngine(BaseEngine):
 
         result_dict = {
             "status": "Success" if failed_count == 0 else "Failed",
+            "dqu_check_type": "range_check",
             "column": column,
             "range": {"min": min_val, "max": max_val},
             "dqu_total_count": total_count,
@@ -334,6 +341,7 @@ class SparkEngine(BaseEngine):
 
         result_dict = {
             "status": "Success" if failed_count == 0 else "Failed",
+            "dqu_check_type": "categoricalvalues_check",
             "column": column,
             "allowed_values": allowed_values,
             "dqu_total_count": total_count,
@@ -381,6 +389,7 @@ class SparkEngine(BaseEngine):
 
             result_dict = {
                 "status": "Success" if passed else "Failed",
+                "dqu_check_type": "statisticaldistribution_check",
                 "mode": "feature_drift",
                 "column": column,
                 "dqu_drift_mean": drift_mean,
@@ -400,6 +409,7 @@ class SparkEngine(BaseEngine):
 
             result_dict = {
                 "status": "Success" if passed else "Failed",
+                "dqu_check_type": "statisticaldistribution_check",
                 "mode": "label_balance",
                 "column": column,
                 "dqu_distribution": dist_dict,
@@ -445,6 +455,7 @@ class SparkEngine(BaseEngine):
 
         result_dict = {
             "status": "Success" if passed else "Failed",
+            "dqu_check_type": "datafreshness_check",
             "column": column,
             "latest_timestamp": str(latest_timestamp),
             "cutoff_timestamp": str(freshness_cutoff),
@@ -480,6 +491,7 @@ class SparkEngine(BaseEngine):
         failed = invalid_rows.count()
         result_dict = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": "referentialintegrity_check",
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,
@@ -513,6 +525,7 @@ class SparkEngine(BaseEngine):
 
         result_dict = {
             "status": status,
+            "dqu_check_type": "rowcount_check",
             "dqu_total_count": total,
             "min_required": min_rows,
             "max_allowed": max_rows,
@@ -544,6 +557,7 @@ class SparkEngine(BaseEngine):
             # column-level UDF
             spark_udf = udf(func, BooleanType())
             failed_df = self.df.filter(~spark_udf(col(column)))
+            check = "custom_check_column"
         else:
             # row-level UDF: pack entire row into a struct, then as dict
             spark_udf = udf(
@@ -551,11 +565,13 @@ class SparkEngine(BaseEngine):
                 BooleanType()
             )
             failed_df = self.df.filter(~spark_udf(struct(*self.df.columns)))
+            check = "custom_check_row"
 
         failed = failed_df.count()
 
         result_dict = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": check,
             "column": column,
             "dqu_total_count": total,
             "dqu_failed_count": failed,

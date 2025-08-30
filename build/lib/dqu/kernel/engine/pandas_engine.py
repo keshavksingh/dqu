@@ -37,6 +37,7 @@ class PandasEngine(BaseEngine):
         failed = duplicates.shape[0]
         result_dict = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": "duplicate_check",
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,
@@ -67,6 +68,7 @@ class PandasEngine(BaseEngine):
         failed = empty_rows.shape[0]
         result_dict = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": "empty_check",
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,
@@ -97,6 +99,7 @@ class PandasEngine(BaseEngine):
         failed = duplicates.shape[0]
         result_dict = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": "unique_check",
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,
@@ -158,6 +161,7 @@ class PandasEngine(BaseEngine):
 
         result_dict = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": "dtype_check",
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,
@@ -192,6 +196,7 @@ class PandasEngine(BaseEngine):
         failed = failed_rows.shape[0]
         result_dict = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": "stringformat_check",
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,
@@ -240,6 +245,7 @@ class PandasEngine(BaseEngine):
 
         result_dict = {
             "status": status,
+            "dqu_check_type": "schemavalidation_check",
             "missing_columns": missing_columns,
             "type_mismatches": mismatched_types,
             "dqu_total_count": df.shape[0],
@@ -282,6 +288,7 @@ class PandasEngine(BaseEngine):
 
         result_dict = {
             "status": "Success" if failed_count == 0 else "Failed",
+            "dqu_check_type": "range_check",
             "column": column,
             "range": {"min": min_val, "max": max_val},
             "dqu_total_count": total_count,
@@ -323,6 +330,7 @@ class PandasEngine(BaseEngine):
 
         result_dict = {
             "status": "Success" if failed_count == 0 else "Failed",
+            "dqu_check_type": "categoricalvalues_check",
             "column": column,
             "allowed_values": allowed_values,
             "dqu_total_count": total_count,
@@ -371,6 +379,7 @@ class PandasEngine(BaseEngine):
 
             result_dict = {
                 "status": "Success" if bool(passed) else "Failed",
+                "dqu_check_type": "statisticaldistribution_check",
                 "mode": "feature_drift",
                 "column": column,
                 "dqu_drift_mean": float(drift_mean),
@@ -389,6 +398,7 @@ class PandasEngine(BaseEngine):
 
             result_dict = {
                 "status": "Success" if bool(passed) else "Failed",
+                "dqu_check_type": "statisticaldistribution_check",
                 "mode": "label_balance",
                 "column": column,
                 "dqu_distribution": counts,
@@ -431,6 +441,7 @@ class PandasEngine(BaseEngine):
 
         result_dict = {
             "status": "Success" if passed else "Failed",
+            "dqu_check_type": "datafreshness_check",
             "column": column,
             "latest_timestamp": str(latest_timestamp),
             "cutoff_timestamp": str(freshness_cutoff),
@@ -464,6 +475,7 @@ class PandasEngine(BaseEngine):
         failed = invalid_rows.shape[0]
         result_dict = {
             "status": "Success" if failed == 0 else "Failed",
+            "dqu_check_type": "referentialintegrity_check",
             "dqu_total_count": total,
             "dqu_failed_count": failed,
             "dqu_passed_count": total - failed,
@@ -497,6 +509,7 @@ class PandasEngine(BaseEngine):
 
         result_dict = {
             "status": status,
+            "dqu_check_type": "rowcount_check",
             "dqu_total_count": total,
             "min_required": min_rows,
             "max_allowed": max_rows,
@@ -531,14 +544,17 @@ class PandasEngine(BaseEngine):
         
         if column:
             mask = ~self.df[column].apply(func)
+            check = "custom_check_column"
         else:
             mask = ~self.df.apply(lambda row: func(row.to_dict()), axis=1)
+            check = "custom_check_row"
 
         failed_df = self.df[mask]
         failed_count = failed_df.shape[0]
 
         result_dict = {
             "status": "Success" if failed_count == 0 else "Failed",
+            "dqu_check_type": check,
             "column": column,
             "dqu_total_count": total,
             "dqu_failed_count": failed_count,
