@@ -13,9 +13,15 @@ It supports:
 - **Pandas** workflows
 - **Apache Spark** for distributed batch/stream processing
 - **Apache Flink** for stream processing
-- **Ray Datasets** for distributed Python-native Machine Learning workflows
+- **Ray Datasets** for distributed Python-native processing
 
 Whether you're working on Any cloud GCP, Azure or AWS or local Jupyter environment, on any of these 4 engines DQU seamlessly integrates into your data pipelines.
+
+---
+
+## GitHub
+
+https://github.com/keshavksingh/dqu
 
 ---
 
@@ -131,7 +137,8 @@ For development:
 
 ```bash
 git clone https://github.com/keshavksingh/dqu.git
-
+cd dqu
+pip install -e .
 ```
 
 ---
@@ -192,6 +199,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "duplicate_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 2,
   "dqu_passed_count": 2,
@@ -222,6 +230,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "empty_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 1,
   "dqu_passed_count": 3,
@@ -251,6 +260,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "unique_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 2,
   "dqu_passed_count": 2,
@@ -281,6 +291,7 @@ print(failed_rows)
 
 {
   "status": "Success",
+  "dqu_check_type": "dtype_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 0,
   "dqu_passed_count": 4,
@@ -319,6 +330,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "stringformat_check",
   "dqu_total_count": 5,
   "dqu_failed_count": 2,
   "dqu_passed_count": 3,
@@ -368,6 +380,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "schemavalidation_check",
   "missing_columns": [],
   "type_mismatches": {
     "age": {
@@ -411,6 +424,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "range_check",
   "column": "age",
   "range": {
     "min": 18,
@@ -456,6 +470,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "categoricalvalues_check",
   "column": "department",
   "allowed_values": [
     "HR",
@@ -507,6 +522,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "statisticaldistribution_check",
   "mode": "feature_drift",
   "column": "salary",
   "dqu_drift_mean": 12400.0,
@@ -548,6 +564,7 @@ print(result)
 
 {
   "status": "Success",
+  "dqu_check_type": "statisticaldistribution_check",
   "mode": "label_balance",
   "column": "label",
   "dqu_distribution": {
@@ -588,6 +605,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "statisticaldistribution_check",
   "mode": "label_balance",
   "column": "label",
   "dqu_distribution": {
@@ -633,6 +651,7 @@ print(result)
 
 {
   "status": "Success",
+  "dqu_check_type": "datafreshness_check",
   "column": "created_at",
   "latest_timestamp": "2025-08-05 14:59:41.348080",
   "cutoff_timestamp": "2025-08-03 14:59:41.350868",
@@ -681,6 +700,7 @@ print(failed_rows)
 
 {
   "status": "Success",
+  "dqu_check_type": "referentialintegrity_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 0,
   "dqu_passed_count": 4,
@@ -727,6 +747,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "referentialintegrity_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 1,
   "dqu_passed_count": 3,
@@ -768,6 +789,7 @@ print(result)
 
 {
   "status": "Success",
+  "dqu_check_type": "rowcount_check",
   "dqu_total_count": 5,
   "min_required": 3,
   "max_allowed": 10,
@@ -803,6 +825,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "rowcount_check",
   "dqu_total_count": 5,
   "min_required": 30,
   "max_allowed": 100,
@@ -843,6 +866,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "custom_check_column",
   "column": "score",
   "dqu_total_count": 4,
   "dqu_failed_count": 1,
@@ -880,6 +904,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "custom_check_row",
   "column": null,
   "dqu_total_count": 4,
   "dqu_failed_count": 3,
@@ -923,6 +948,7 @@ failed_rows.show()
 
 {
   "status": "Failed",
+  "dqu_check_type": "duplicate_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 2,
   "dqu_passed_count": 2,
@@ -955,6 +981,7 @@ failed.show()
 
 {
   "status": "Failed",
+  "dqu_check_type": "empty_check",
   "dqu_total_count": 2,
   "dqu_failed_count": 1,
   "dqu_passed_count": 1,
@@ -987,6 +1014,7 @@ failed_rows.show()
 
 {
   "status": "Failed",
+  "dqu_check_type": "unique_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 2,
   "dqu_passed_count": 2,
@@ -1020,6 +1048,7 @@ failed_rows.show()
 
 {
   "status": "Success",
+  "dqu_check_type": "dtype_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 0,
   "dqu_passed_count": 4,
@@ -1057,6 +1086,7 @@ failed_rows.show()
 
 {
   "status": "Failed",
+  "dqu_check_type": "stringformat_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 2,
   "dqu_passed_count": 2,
@@ -1117,6 +1147,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "schemavalidation_check",
   "missing_columns": [],
   "type_mismatches": {
     "age": {
@@ -1168,6 +1199,7 @@ failed_rows.show()
 
 {
   "status": "Failed",
+  "dqu_check_type": "range_check",
   "column": "age",
   "range": {
     "min": 18,
@@ -1225,6 +1257,7 @@ failed_rows.show()
 
 {
   "status": "Failed",
+  "dqu_check_type": "categoricalvalues_check",
   "column": "department",
   "allowed_values": [
     "HR",
@@ -1290,6 +1323,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "statisticaldistribution_check",
   "mode": "feature_drift",
   "column": "salary",
   "dqu_drift_mean": 12400.0,
@@ -1343,6 +1377,7 @@ print(result)
 
 {
   "status": "Success",
+  "dqu_check_type": "statisticaldistribution_check",
   "mode": "label_balance",
   "column": "label",
   "dqu_distribution": {
@@ -1386,6 +1421,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "statisticaldistribution_check",
   "mode": "label_balance",
   "column": "label",
   "dqu_distribution": {
@@ -1442,6 +1478,7 @@ print(result)
 
 {
   "status": "Success",
+  "dqu_check_type": "datafreshness_check",
   "column": "created_at",
   "latest_timestamp": "2025-08-06 06:02:02.786425",
   "cutoff_timestamp": "2025-08-04 06:02:03.106781",
@@ -1507,6 +1544,7 @@ failed_rows.show()
 
 {
   "status": "Success",
+  "dqu_check_type": "referentialintegrity_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 0,
   "dqu_passed_count": 4,
@@ -1569,6 +1607,7 @@ failed_rows.show()
 
 {
   "status": "Failed",
+  "dqu_check_type": "referentialintegrity_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 1,
   "dqu_passed_count": 3,
@@ -1619,6 +1658,7 @@ print(result)
 
 {
   "status": "Success",
+  "dqu_check_type": "rowcount_check",
   "dqu_total_count": 5,
   "min_required": 3,
   "max_allowed": 10,
@@ -1660,6 +1700,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "rowcount_check",
   "dqu_total_count": 5,
   "min_required": 30,
   "max_allowed": 100,
@@ -1710,6 +1751,7 @@ failed_rows.show()
 
 {
   "status": "Failed",
+  "dqu_check_type": "custom_check_column",
   "column": "score",
   "dqu_total_count": 4,
   "dqu_failed_count": 1,
@@ -1761,6 +1803,7 @@ failed_rows.show()
 
 {
   "status": "Failed",
+  "dqu_check_type": "custom_check_row",
   "column": null,
   "dqu_total_count": 4,
   "dqu_failed_count": 3,
@@ -1826,6 +1869,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "duplicate_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 2,
   "dqu_passed_count": 2,
@@ -1870,6 +1914,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "empty_check",
   "dqu_total_count": 3,
   "dqu_failed_count": 1,
   "dqu_passed_count": 2,
@@ -1916,6 +1961,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "unique_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 2,
   "dqu_passed_count": 2,
@@ -1966,6 +2012,7 @@ print(result)
 print(failed_rows)
 {
   "status": "Success",
+  "dqu_check_type": "dtype_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 0,
   "dqu_passed_count": 4,
@@ -2015,6 +2062,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "stringformat_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 2,
   "dqu_passed_count": 2,
@@ -2067,6 +2115,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "schemavalidation_check",
   "missing_columns": [],
   "type_mismatches": {
     "age": {
@@ -2116,6 +2165,7 @@ print(failed)
 
 {
   "status": "Failed",
+  "dqu_check_type": "range_check",
   "column": "temperature",
   "range": {
     "min": 10,
@@ -2172,6 +2222,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "categoricalvalues_check",
   "allowed_values": [
     "HR",
     "Finance",
@@ -2234,6 +2285,7 @@ result = check.run(evaluation="advanced")
 print(result)
 {
   "status": "Failed",
+  "dqu_check_type": "statisticaldistribution_check",
   "mode": "feature_drift",
   "column": "salary",
   "dqu_drift_mean": 12400.0,
@@ -2292,6 +2344,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "datafreshness_check",
   "column": "created_at",
   "latest_timestamp": "2025-08-04T17:13:29.502000+00:00",
   "cutoff_timestamp": "2025-08-05T10:13:39.074587+00:00",
@@ -2351,6 +2404,7 @@ print(result)
 print(failed_rows)
 {
   "status": "Success",
+  "dqu_check_type": "referentialintegrity_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 0,
   "dqu_passed_count": 4,
@@ -2405,6 +2459,7 @@ print(result)
 print(failed_rows)
 {
   "status": "Failed",
+  "dqu_check_type": "referentialintegrity_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 1,
   "dqu_passed_count": 3,
@@ -2453,6 +2508,7 @@ result = check.run(evaluation="advanced")
 print(result)
 {
   "status": "Success",
+  "dqu_check_type": "rowcount_check",
   "dqu_total_count": 5,
   "min_required": 3,
   "max_allowed": 10,
@@ -2497,6 +2553,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "rowcount_check",
   "dqu_total_count": 5,
   "min_required": 2,
   "max_allowed": 4,
@@ -2545,6 +2602,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "custom_check_column",
   "column": "score",
   "dqu_total_count": 4,
   "dqu_failed_count": 1,
@@ -2590,6 +2648,7 @@ print(failed_rows)
 
 {
   "status": "Failed",
+  "dqu_check_type": "custom_check_row",
   "column": null,
   "dqu_total_count": 4,
   "dqu_failed_count": 3,
@@ -2634,6 +2693,7 @@ print(result)
 failed_rows.show(limit=10)
 {
   "status": "Failed",
+  "dqu_check_type": "duplicate_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 2,
   "dqu_passed_count": 2,
@@ -2677,6 +2737,7 @@ failed_rows.show(limit=10)
 
 {
   "status": "Failed",
+  "dqu_check_type": "empty_check",
   "dqu_total_count": 3,
   "dqu_failed_count": 1,
   "dqu_passed_count": 2,
@@ -2716,6 +2777,7 @@ failed_rows.show(limit=10)
 
 {
   "status": "Failed",
+  "dqu_check_type": "unique_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 2,
   "dqu_passed_count": 2,
@@ -2762,6 +2824,7 @@ print(result)
 failed_rows.show(limit=10)
 {
   "status": "Success",
+  "dqu_check_type": "dtype_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 0,
   "dqu_passed_count": 4,
@@ -2804,6 +2867,7 @@ failed_rows.show(limit=10)
 
 {
   "status": "Failed",
+  "dqu_check_type": "stringformat_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 2,
   "dqu_passed_count": 2,
@@ -2851,6 +2915,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "schemavalidation_check",
   "missing_columns": [],
   "type_mismatches": {
     "age": {
@@ -2898,6 +2963,7 @@ failed_rows.show(limit=10)
 
 {
   "status": "Failed",
+  "dqu_check_type": "range_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 2,
   "dqu_passed_count": 2,
@@ -2950,6 +3016,7 @@ failed_rows.show(limit=10)
 
 {
   "status": "Failed",
+  "dqu_check_type": "categoricalvalues_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 1,
   "dqu_passed_count": 3,
@@ -3006,6 +3073,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "statisticaldistribution_check",
   "mode": "feature_drift",
   "column": "salary",
   "dqu_drift_mean": 12400.0,
@@ -3053,6 +3121,7 @@ result = check.run(evaluation="advanced")
 print(result)
 {
   "status": "Success",
+  "dqu_check_type": "statisticaldistribution_check",
   "mode": "label_balance",
   "column": "label",
   "dqu_distribution": {
@@ -3091,6 +3160,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "statisticaldistribution_check",
   "mode": "label_balance",
   "column": "label",
   "dqu_distribution": {
@@ -3139,6 +3209,7 @@ result = check.run(evaluation="advanced")
 print(result)
 {
   "status": "Success",
+  "dqu_check_type": "datafreshness_check",
   "column": "created_at",
   "latest_timestamp": "2025-08-06 09:30:41.736244",
   "cutoff_timestamp": "2025-08-04 02:30:46.178669",
@@ -3195,6 +3266,7 @@ failed_rows.show(limit=10)
 
 {
   "status": "Success",
+  "dqu_check_type": "referentialintegrity_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 0,
   "dqu_passed_count": 4,
@@ -3245,6 +3317,7 @@ failed_rows.show(limit=10)
 
 {
   "status": "Failed",
+  "dqu_check_type": "referentialintegrity_check",
   "dqu_total_count": 4,
   "dqu_failed_count": 1,
   "dqu_passed_count": 3,
@@ -3289,6 +3362,7 @@ result = check.run(evaluation="advanced")
 print(result)
 {
   "status": "Success",
+  "dqu_check_type": "rowcount_check",
   "dqu_total_count": 5,
   "min_required": 3,
   "max_allowed": 10,
@@ -3329,6 +3403,7 @@ print(result)
 
 {
   "status": "Failed",
+  "dqu_check_type": "rowcount_check",
   "dqu_total_count": 5,
   "min_required": 30,
   "max_allowed": 100,
@@ -3372,6 +3447,7 @@ failed_rows.show()
 
 {
   "status": "Failed",
+  "dqu_check_type": "custom_check_column",
   "column": "score",
   "dqu_total_count": 4,
   "dqu_failed_count": 1,
@@ -3412,6 +3488,7 @@ failed_rows.show()
 
 {
   "status": "Failed",
+  "dqu_check_type": "custom_check_row",
   "column": null,
   "dqu_total_count": 4,
   "dqu_failed_count": 3,
