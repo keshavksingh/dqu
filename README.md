@@ -158,19 +158,21 @@ pip install -e .
 
 ## Available Checks
 
-| Check Name               | Class Name             | Description                             |
-| ------------------------ | ---------------------- | --------------------------------------- |
-| Duplicate Check          | `DquDupCheck`          | Detects duplicates based on columns     |
-| Empty/Null Check         | `DquEmptyCheck`        | Checks for missing values               |
-| Uniqueness Check         | `DquUniqCheck`         | Ensures column uniqueness               |
-| Range Check              | `DquRangeCheck`        | Enforces min/max thresholds             |
-| String Format Check      | `DquStrFmtCheck`       | Validates string formats (e.g., email)  |
-| Categorical Check        | `DquCategoricalCheck`  | Checks values against an allowed set    |
-| Schema Check             | `DquSchemaCheck`       | Verifies types for each column          |
-| Freshness Check          | `DquFreshnessCheck`    | Validates timestamp recency             |
-| Referential Integrity    | `DquRefIntegrityCheck` | Cross-checks between datasets           |
-| Statistical Distribution | `DquStatisticalCheck`  | Validates against mean/std expectations |
-| Custom Python Check      | `DquCustomCheck`       | Run your own logic for validation       |
+| Check Name               | Class Name                       | Description                                                |
+| ------------------------ | -------------------------------- | -----------------------------------------------------------|
+| Duplicate Check          | `DquDupCheck`                    | Detects duplicates based on columns                        |
+| Empty/Null Check         | `DquEmptyCheck`                  | Checks for missing values                                  |
+| Uniqueness Check         | `DquUniqueCheck`                 | Ensures column uniqueness                                  |
+| Data Type Check          | `DquDtypeCheck`                  | Ensures column Data Type                                   |
+| Row Count Check          | `DquRowCountCheck`               | Row Count Check                                            |
+| Range Check              | `DquRangeCheck`                  | Enforces min/max thresholds                                |
+| String Format Check      | `DquStringFormatCheck`           | Validates string formats (e.g., email)                     |
+| Categorical Check        | `DquCategoricalValuesCheck`      | Checks values against an allowed set                       |
+| Schema Check             | `DquSchemaValidationCheck`       | Verifies types for each column                             |
+| Freshness Check          | `DquDataFreshnessCheck`          | Validates timestamp recency                                |
+| Referential Integrity    | `DquReferentialIntegrityCheck`   | Cross-checks between datasets                              |
+| Statistical Distribution | `DquStatisticalDistributionCheck`| Validates against mean/std expectations                    |
+| Custom Python Check      | `DquCustomCheck`                 | Run your own logic for validation (Column/Row) Level       |
 
 ---
 
