@@ -25,6 +25,13 @@ https://github.com/keshavksingh/dqu
 
 ---
 
+## PyPI
+https://pypi.org/project/dqu
+
+pip install dqu
+
+---
+
 ## 📚 Table of Contents
 
 - [What is DQU?](#what-is-dqu)
