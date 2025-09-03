@@ -13,7 +13,7 @@ It supports:
 - **Pandas** workflows
 - **Apache Spark** for distributed batch/stream processing
 - **Apache Flink** for stream processing
-- **Ray Datasets** for distributed Python-native processing
+- **Ray Datasets** for distributed Python-native ML processing
 
 Whether you're working on Any cloud GCP, Azure or AWS or local Jupyter environment, on any of these 4 engines DQU seamlessly integrates into your data pipelines.
 
