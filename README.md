@@ -15,7 +15,7 @@ It supports:
 - **Apache Flink** for stream processing
 - **Ray Datasets** for distributed Python-native ML processing
 
-Whether you're working on Any cloud GCP, Azure or AWS or local Jupyter environment, on any of these 4 engines DQU seamlessly integrates into your data pipelines.
+It serves diverse environments you're working on, it could be any cloud GCP, Azure or AWS or local Jupyter environment, on any of these 4 (Pandas, Spark, Flink, Ray) engines DQU seamlessly integrates into your data pipelines. Unified Data Quality for Data & ML engineering pipelines.
 
 ---
 
@@ -925,7 +925,7 @@ print(failed_rows)
 ## 📌 Notes
 
 - All checks support two `evaluation` modes: `"basic"` (summary JSON) and `"advanced"` (summary JSON + failed rows).
-- Optiinally Ensure `run_id` is set for tracking results consistently across runs.
+- Optionally Ensure `run_id` is set for tracking results consistently across runs.
 
 ## 2. Using with **Apache Spark**
 
