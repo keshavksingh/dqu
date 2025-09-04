@@ -13,22 +13,16 @@ It supports:
 - **Pandas** workflows
 - **Apache Spark** for distributed batch/stream processing
 - **Apache Flink** for stream processing
-- **Ray Datasets** for distributed Python-native ML processing
+- **Ray Datasets** for distributed Python-native processing
+- **Spark, Pandas, Ray** through a YAML config
 
-It serves diverse environments you're working on, it could be any cloud GCP, Azure or AWS or local Jupyter environment, on any of these 4 (Pandas, Spark, Flink, Ray) engines DQU seamlessly integrates into your data pipelines. Unified Data Quality for Data & ML engineering pipelines.
+Whether you're working on Any cloud GCP, Azure or AWS or local Jupyter environment, on any of these 4 engines DQU seamlessly integrates into your data pipelines.
 
 ---
 
 ## GitHub
 
 https://github.com/keshavksingh/dqu
-
----
-
-## PyPI
-https://pypi.org/project/dqu
-
-pip install dqu
 
 ---
 
@@ -99,6 +93,11 @@ pip install dqu
     - [4.12 Referential Integrity Check](#412-referential-integrity-check)
     - [4.13 Row Count Check](#413-row-count-check)
     - [4.14 Custom Check](#414-custom-check---powerful)
+  - [5. Yaml Config Driven Evaluation for Ray/Spark/Pandas](#5-yaml-config-driven-evaluation-for-sparkraypandas)
+    - [API Run Checks from Yaml Config](#api-run_checks_from_yaml)
+    - [Example for Ray](#example-yaml-config-dqu_ray_checkyml)
+    - [Example for Pandas](#example-for-pandas-python)
+    - [Example for PySpark](#example-for-spark-pyspark)
 - [Notes](#-notes)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -165,21 +164,21 @@ pip install -e .
 
 ## Available Checks
 
-| Check Name               | Class Name                       | Description                                                |
-| ------------------------ | -------------------------------- | -----------------------------------------------------------|
-| Duplicate Check          | `DquDupCheck`                    | Detects duplicates based on columns                        |
-| Empty/Null Check         | `DquEmptyCheck`                  | Checks for missing values                                  |
-| Uniqueness Check         | `DquUniqueCheck`                 | Ensures column uniqueness                                  |
-| Data Type Check          | `DquDtypeCheck`                  | Ensures column Data Type                                   |
-| Row Count Check          | `DquRowCountCheck`               | Row Count Check                                            |
-| Range Check              | `DquRangeCheck`                  | Enforces min/max thresholds                                |
-| String Format Check      | `DquStringFormatCheck`           | Validates string formats (e.g., email)                     |
-| Categorical Check        | `DquCategoricalValuesCheck`      | Checks values against an allowed set                       |
-| Schema Check             | `DquSchemaValidationCheck`       | Verifies types for each column                             |
-| Freshness Check          | `DquDataFreshnessCheck`          | Validates timestamp recency                                |
-| Referential Integrity    | `DquReferentialIntegrityCheck`   | Cross-checks between datasets                              |
-| Statistical Distribution | `DquStatisticalDistributionCheck`| Validates against mean/std expectations                    |
-| Custom Python Check      | `DquCustomCheck`                 | Run your own logic for validation (Column/Row) Level       |
+| Check Name               | Class Name                        | Description                                          |
+| ------------------------ | --------------------------------- | ---------------------------------------------------- |
+| Duplicate Check          | `DquDupCheck`                     | Detects duplicates based on columns                  |
+| Empty/Null Check         | `DquEmptyCheck`                   | Checks for missing values                            |
+| Uniqueness Check         | `DquUniqueCheck`                  | Ensures column uniqueness                            |
+| Data Type Check          | `DquDtypeCheck`                   | Ensures column Data Type                             |
+| Row Count Check          | `DquRowCountCheck`                | Row Count Check                                      |
+| Range Check              | `DquRangeCheck`                   | Enforces min/max thresholds                          |
+| String Format Check      | `DquStringFormatCheck`            | Validates string formats (e.g., email)               |
+| Categorical Check        | `DquCategoricalValuesCheck`       | Checks values against an allowed set                 |
+| Schema Check             | `DquSchemaValidationCheck`        | Verifies types for each column                       |
+| Freshness Check          | `DquDataFreshnessCheck`           | Validates timestamp recency                          |
+| Referential Integrity    | `DquReferentialIntegrityCheck`    | Cross-checks between datasets                        |
+| Statistical Distribution | `DquStatisticalDistributionCheck` | Validates against mean/std expectations              |
+| Custom Python Check      | `DquCustomCheck`                  | Run your own logic for validation (Column/Row) Level |
 
 ---
 
@@ -932,7 +931,7 @@ print(failed_rows)
 ## 📌 Notes
 
 - All checks support two `evaluation` modes: `"basic"` (summary JSON) and `"advanced"` (summary JSON + failed rows).
-- Optionally Ensure `run_id` is set for tracking results consistently across runs.
+- Optiinally Ensure `run_id` is set for tracking results consistently across runs.
 
 ## 2. Using with **Apache Spark**
 
@@ -3509,6 +3508,658 @@ failed_rows.show()
 {'id': 2, 'age': 17, 'country': 'US'}
 {'id': 3, 'age': 35, 'country': 'CA'}
 {'id': 4, 'age': 45, 'country': 'IN'}
+```
+
+---
+
+## 5. YAML Config Driven Evaluation for **Spark/Ray/Pandas**
+
+You can define a suite of data quality checks in a YAML file and run them on your dataset using Pandas, Spark, or Ray engines. This enables easy, declarative, and repeatable DQ validation.
+
+**Runs DQU checks as specified in a YAML config file or YAML string.**
+
+### API: `run_checks_from_yaml`
+
+#### Parameters:
+
+- **dataframe**: `DquDataFrame`
+- **yaml_path**: Path to YAML config file (optional)
+- **yaml_string**: YAML config as a string (optional)
+  - Both `yaml_path` and `yaml_string` cannot be None; one must be provided.
+- **write_to_file**: If `True`, writes results to a JSON file in current directory; if `False`, returns results as a JSON string
+- **df_mapping**: A dictionary mapping reference DataFrame names to actual DataFrame objects (optional, used only for referential integrity)
+
+#### Returns:
+
+- If `write_to_file` is `False`, returns the results as a JSON string.
+- If `write_to_file` is `True`, writes results to a file and returns nothing.
+
+#### Raises:
+
+- Exception with a helpful message if YAML or check config is invalid.
+
+### Example YAML Config (`dqu_ray_check.yml`)
+
+```yaml
+run_id: "123e4567-e89b-12d3-a456-426614174000"
+checks:
+  - type: "duplicate"
+    columns: ["id"]
+
+  - type: "empty"
+    columns: ["name", "age"]
+
+  - type: "unique"
+    columns: ["id"]
+
+  - type: "dtype"
+    columns:
+      id: int
+      name: str
+      age: int
+
+  - type: "stringformat"
+    column: "email"
+    pattern: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+
+  - type: "schemavalidation"
+    expected_schema:
+      id: int
+      name: str
+      age: int
+      email: str
+      department: str
+      salary: float
+      label: int
+      created_at: timestamp
+      user_id: int
+      score: int
+      country: str
+
+  - type: "range"
+    column: "age"
+    min: 18
+    max: 65
+
+  - type: "categoricalvalues"
+    column: "department"
+    allowed_values: ["HR", "Finance", "Engineering"]
+
+  - type: "statisticaldistribution"
+    column: "salary"
+    mode: "feature_drift"
+    reference_stats:
+      mean: 70000
+      std: 5000
+    tolerance: 0.1
+
+  - type: "statisticaldistribution"
+    column: "label"
+    mode: "label_balance"
+
+  - type: "datafreshness"
+    column: "created_at"
+    freshness_threshold: "2h"
+
+  - type: "referentialintegrity"
+    column: "user_id"
+    reference_df: "ref_df"
+    reference_column: "id"
+
+  - type: "rowcount"
+    min: 30
+    max: 100
+
+  - type: "custom"
+    column: "score"
+    func: "lambda x: x >= 0"
+
+  - type: "custom"
+    func: "lambda row: row['age'] >= 18 and row['country'] == 'US'"
+```
+
+### Example Python Code to Run the YAML Config with Ray
+
+```python
+import ray
+from datetime import datetime, timedelta
+import numpy as np
+from dqu.kernel.dataframe import DquDataFrame
+from dqu.config_runner import DquConfigRunner
+
+if not ray.is_initialized():
+    ray.init(ignore_reinit_error=True)
+
+# ---- MAIN DATASET ----
+now = datetime.utcnow()
+main_data = []
+for i in range(1, 31):  # 30 rows to satisfy rowcount
+    row = {
+        "id": i,
+        "name": f"User{i}",
+        "age": np.random.randint(18, 65),
+        "email": f"user{i}@example.com",
+        "department": np.random.choice(["HR", "Finance", "Engineering"]),
+        "salary": float(np.random.normal(70000, 5000)),
+        "label": np.random.choice([0, 1]),
+        "created_at": now - timedelta(minutes=30),
+        "user_id": 100 + i,
+        "score": np.random.randint(0, 100),
+        "country": "US"
+    }
+    main_data.append(row)
+
+main_ds = ray.data.from_items(main_data)
+dqu_main = DquDataFrame(main_ds)
+
+# ---- REFERENCE DATASET ----
+ref_data = [{"id": 100 + i} for i in range(1, 41)]
+ref_ds = ray.data.from_items(ref_data)
+df_mapping = {"ref_df": ref_ds}
+
+# ---- RUN ALL CHECKS ----
+results = DquConfigRunner.run_checks_from_yaml(
+    dataframe=dqu_main,
+    yaml_path="<>/dqu_ray_check.yml",
+    write_to_file=True,
+    df_mapping=df_mapping
+)
+
+print(results)
+```
+
+```JSON
+[
+  {
+    "status": "Success",
+    "dqu_check_type": "duplicate_check",
+    "dqu_total_count": 30,
+    "dqu_failed_count": 0,
+    "dqu_passed_count": 30,
+    "run_timestamp": "2025-09-04T20:59:11.864689+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "dqu_eval_config": {
+      "type": "duplicate",
+      "columns": [
+        "id"
+      ]
+    }
+  },
+  {
+    "status": "Success",
+    "dqu_check_type": "empty_check",
+    "dqu_total_count": 30,
+    "dqu_failed_count": 0,
+    "dqu_passed_count": 30,
+    "run_timestamp": "2025-09-04T20:59:13.133235+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "dqu_eval_config": {
+      "type": "empty",
+      "columns": [
+        "name",
+        "age"
+      ]
+    }
+  },
+  {
+    "status": "Success",
+    "dqu_check_type": "unique_check",
+    "dqu_total_count": 30,
+    "dqu_failed_count": 0,
+    "dqu_passed_count": 30,
+    "run_timestamp": "2025-09-04T20:59:15.717631+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "dqu_eval_config": {
+      "type": "unique",
+      "columns": [
+        "id"
+      ]
+    }
+  },
+  {
+    "status": "Success",
+    "dqu_check_type": "dtype_check",
+    "dqu_total_count": 30,
+    "dqu_failed_count": 0,
+    "dqu_passed_count": 30,
+    "run_timestamp": "2025-09-04T20:59:16.264573+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "dqu_eval_config": {
+      "type": "dtype",
+      "columns": {
+        "id": "int",
+        "name": "str",
+        "age": "int"
+      }
+    }
+  },
+  {
+    "status": "Success",
+    "dqu_check_type": "stringformat_check",
+    "dqu_total_count": 30,
+    "dqu_failed_count": 0,
+    "dqu_passed_count": 30,
+    "run_timestamp": "2025-09-04T20:59:17.010052+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "dqu_eval_config": {
+      "type": "stringformat",
+      "column": "email",
+      "pattern": "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+    }
+  },
+  {
+    "status": "Failed",
+    "dqu_check_type": "schemavalidation_check",
+    "missing_columns": [],
+    "type_mismatches": {
+      "id": {
+        "expected": "int",
+        "actual": "int64"
+      },
+      "name": {
+        "expected": "str",
+        "actual": "string"
+      },
+      "age": {
+        "expected": "int",
+        "actual": "int64"
+      },
+      "email": {
+        "expected": "str",
+        "actual": "string"
+      },
+      "department": {
+        "expected": "str",
+        "actual": "string"
+      },
+      "salary": {
+        "expected": "float",
+        "actual": "double"
+      },
+      "label": {
+        "expected": "int",
+        "actual": "int32"
+      },
+      "created_at": {
+        "expected": "timestamp",
+        "actual": "timestamp[us]"
+      },
+      "user_id": {
+        "expected": "int",
+        "actual": "int64"
+      },
+      "score": {
+        "expected": "int",
+        "actual": "int64"
+      },
+      "country": {
+        "expected": "str",
+        "actual": "string"
+      }
+    },
+    "dqu_total_count": 30,
+    "dqu_failed_count": 11,
+    "dqu_passed_count": 0,
+    "run_timestamp": "2025-09-04T20:59:17.010708+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "dqu_eval_config": {
+      "type": "schemavalidation",
+      "expected_schema": {
+        "id": "int",
+        "name": "str",
+        "age": "int",
+        "email": "str",
+        "department": "str",
+        "salary": "float",
+        "label": "int",
+        "created_at": "timestamp",
+        "user_id": "int",
+        "score": "int",
+        "country": "str"
+      }
+    }
+  },
+  {
+    "status": "Success",
+    "dqu_check_type": "range_check",
+    "dqu_total_count": 30,
+    "dqu_failed_count": 0,
+    "dqu_passed_count": 30,
+    "run_timestamp": "2025-09-04T20:59:17.420218+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "column": "age",
+    "range": {
+      "min": 18,
+      "max": 65
+    },
+    "dqu_eval_config": {
+      "type": "range",
+      "column": "age",
+      "min": 18,
+      "max": 65
+    }
+  },
+  {
+    "status": "Success",
+    "dqu_check_type": "categoricalvalues_check",
+    "dqu_total_count": 30,
+    "dqu_failed_count": 0,
+    "dqu_passed_count": 30,
+    "run_timestamp": "2025-09-04T20:59:18.128209+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "allowed_values": [
+      "HR",
+      "Finance",
+      "Engineering"
+    ],
+    "dqu_eval_config": {
+      "type": "categoricalvalues",
+      "column": "department",
+      "allowed_values": [
+        "HR",
+        "Finance",
+        "Engineering"
+      ]
+    }
+  },
+  {
+    "status": "Failed",
+    "dqu_check_type": "statisticaldistribution_check",
+    "mode": "feature_drift",
+    "column": "salary",
+    "dqu_drift_mean": 172.97654345190676,
+    "dqu_drift_std": 989.9788967435034,
+    "dqu_passed": false,
+    "run_timestamp": "2025-09-04T20:59:21.223538+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "dqu_eval_config": {
+      "type": "statisticaldistribution",
+      "column": "salary",
+      "mode": "feature_drift",
+      "reference_stats": {
+        "mean": 70000,
+        "std": 5000
+      },
+      "tolerance": 0.1
+    }
+  },
+  {
+    "status": "Success",
+    "dqu_check_type": "statisticaldistribution_check",
+    "mode": "label_balance",
+    "column": "label",
+    "dqu_distribution": {
+      "1": 0.6,
+      "0": 0.4
+    },
+    "dqu_passed": true,
+    "run_timestamp": "2025-09-04T20:59:21.362669+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "dqu_eval_config": {
+      "type": "statisticaldistribution",
+      "column": "label",
+      "mode": "label_balance"
+    }
+  },
+  {
+    "status": "Success",
+    "dqu_check_type": "datafreshness_check",
+    "column": "created_at",
+    "latest_timestamp": "2025-09-04 20:28:58.910817+00:00",
+    "cutoff_timestamp": "2025-09-04 18:59:22.187068+00:00",
+    "dqu_passed": true,
+    "run_timestamp": "2025-09-04T20:59:22.187068+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "dqu_eval_config": {
+      "type": "datafreshness",
+      "column": "created_at",
+      "freshness_threshold": "2h"
+    }
+  },
+  {
+    "status": "Success",
+    "dqu_check_type": "referentialintegrity_check",
+    "column": "user_id",
+    "dqu_total_count": 30,
+    "dqu_failed_count": 0,
+    "dqu_passed_count": 30,
+    "run_timestamp": "2025-09-04T20:59:24.382812+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "dqu_eval_config": {
+      "type": "referentialintegrity",
+      "column": "user_id",
+      "reference_df": "ref_df",
+      "reference_column": "id"
+    }
+  },
+  {
+    "status": "Success",
+    "dqu_check_type": "rowcount_check",
+    "dqu_total_count": 30,
+    "min_required": 30,
+    "max_allowed": 100,
+    "run_timestamp": "2025-09-04T20:59:24.383478+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "dqu_eval_config": {
+      "type": "rowcount",
+      "min": 30,
+      "max": 100
+    }
+  },
+  {
+    "status": "Success",
+    "dqu_check_type": "custom_check_column",
+    "column": "score",
+    "dqu_total_count": 30,
+    "dqu_failed_count": 0,
+    "dqu_passed_count": 30,
+    "run_timestamp": "2025-09-04T20:59:24.894960+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "dqu_eval_config": {
+      "type": "custom",
+      "column": "score",
+      "func": "lambda x: x >= 0"
+    }
+  },
+  {
+    "status": "Success",
+    "dqu_check_type": "custom_check_row",
+    "column": null,
+    "dqu_total_count": 30,
+    "dqu_failed_count": 0,
+    "dqu_passed_count": 30,
+    "run_timestamp": "2025-09-04T20:59:25.280227+00:00",
+    "run_id": "123e4567-e89b-12d3-a456-426614174000",
+    "dqu_eval_config": {
+      "type": "custom",
+      "func": "lambda row: row['age'] >= 18 and row['country'] == 'US'"
+    }
+  }
+]
+```
+
+### Example for Pandas Python
+
+```python
+yaml_string = """
+run_id: "123e4567-e89b-12d3-a456-426614174000"
+checks:
+  - type: "duplicate"
+    columns: ["id"]
+
+  - type: "empty"
+    columns: ["name", "age"]
+
+  - type: "unique"
+    columns: ["id"]
+
+  - type: "dtype"
+    columns:
+      id: int
+      name: str
+      age: int
+
+  - type: "stringformat"
+    column: "email"
+    pattern: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+
+  - type: "schemavalidation"
+    expected_schema:
+      id: int
+      name: object
+      age: int
+
+  - type: "range"
+    column: "age"
+    min: 18
+    max: 65
+
+  - type: "categoricalvalues"
+    column: "department"
+    allowed_values: ["HR", "Finance", "Engineering"]
+
+  - type: "statisticaldistribution"
+    column: "salary"
+    mode: "feature_drift"
+    reference_stats:
+      mean: 70000
+      std: 5000
+    tolerance: 0.1
+
+  - type: "statisticaldistribution"
+    column: "label"
+    mode: "label_balance"
+
+  - type: "datafreshness"
+    column: "created_at"
+    freshness_threshold: "-2h"
+
+  - type: "referentialintegrity"
+    column: "user_id"
+    reference_df: "ref_df"
+    reference_column: "id"
+
+  - type: "rowcount"
+    min: 30
+    max: 100
+
+  - type: "custom"
+    column: "score"
+    func: "lambda x: x >= 0"
+
+  - type: "custom"
+    func: "lambda row: row['age'] >= 18 and row['country'] == 'US'"
+"""
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+
+# Main DataFrame
+main_data = {
+    "id": range(1, 31),  # 30 unique IDs (meets rowcount + unique + no duplicate)
+    "name": [f"User{i}" for i in range(1, 31)],
+    "age": np.random.randint(18, 60, size=30),  # within 18–65
+    "email": [f"user{i}@example.com" for i in range(1, 30)] + ["test@example.com"],
+    "department": np.random.choice(["HR", "Finance", "Engineering"], size=30),
+    "salary": np.random.normal(loc=70000, scale=5000, size=30),  # matches reference stats
+    "label": np.random.choice([0, 1], size=30),
+    "created_at": [datetime.now() - timedelta(minutes=30)] * 30,  # fresh within 2h
+    "user_id": range(101, 131),  # will match ref_df
+    "score": np.random.randint(0, 100, size=30),
+    "country": ["US"] * 30  # satisfies custom func row['country'] == 'US'
+}
+main_df = pd.DataFrame(main_data)
+
+# Reference DataFrame for referential integrity
+ref_data = {
+    "id": list(range(100, 140))  # includes all main_df user_id values
+}
+ref_df = pd.DataFrame(ref_data)
+
+from dqu.kernel.dataframe import DquDataFrame
+from dqu.config_runner import DquConfigRunner
+
+dqu_main = DquDataFrame(main_df)
+df_mapping = {"ref_df": ref_df}
+
+results = DquConfigRunner.run_checks_from_yaml(
+    dataframe=dqu_main,
+    yaml_string=yaml_string,
+    write_to_file=False,
+    df_mapping=df_mapping
+)
+
+print(results)
+
+```
+
+### Example for Spark PySpark
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.types import *
+import numpy as np
+from datetime import datetime, timedelta
+
+
+spark = SparkSession.builder.appName("DQU_Test_Data").getOrCreate()
+
+# ----- Main Data -----
+main_data = {
+    "id": list(range(1, 31)),  # 30 unique IDs
+    "name": [f"User{i}" for i in range(1, 31)],
+    "age": np.random.randint(18, 60, size=30).tolist(),  # within 18–65
+    "email": [f"user{i}@example.com" for i in range(1, 30)] + ["test@example.com"],
+    "department": np.random.choice(["HR", "Finance", "Engineering"], size=30).tolist(),
+    "salary": np.random.normal(loc=70000, scale=5000, size=30).tolist(),
+    "label": np.random.choice([0, 1], size=30).tolist(),
+    "created_at": [datetime.now() - timedelta(minutes=30)] * 30,  # fresh within 2h
+    "user_id": list(range(101, 131)),  # will match ref_df
+    "score": np.random.randint(0, 100, size=30).tolist(),
+    "country": ["US"] * 30
+}
+
+main_rows = [dict(zip(main_data.keys(), values)) for values in zip(*main_data.values())]
+
+main_schema = StructType([
+    StructField("id", IntegerType(), False),
+    StructField("name", StringType(), False),
+    StructField("age", IntegerType(), False),
+    StructField("email", StringType(), False),
+    StructField("department", StringType(), False),
+    StructField("salary", DoubleType(), False),
+    StructField("label", IntegerType(), False),
+    StructField("created_at", TimestampType(), False),
+    StructField("user_id", IntegerType(), False),
+    StructField("score", IntegerType(), False),
+    StructField("country", StringType(), False),
+])
+
+# Create Spark DataFrame
+main_spark_df = spark.createDataFrame(main_rows, schema=main_schema)
+
+# ----- Reference Data -----
+ref_data = {"id": list(range(100, 140))}
+ref_rows = [{"id": i} for i in ref_data["id"]]
+
+ref_schema = StructType([StructField("id", IntegerType(), False)])
+ref_spark_df = spark.createDataFrame(ref_rows, schema=ref_schema)
+
+from dqu.kernel.dataframe import DquDataFrame
+from dqu.config_runner import DquConfigRunner
+
+dqu_main = DquDataFrame(main_spark_df)
+df_mapping = {"ref_df": ref_spark_df}
+
+results = DquConfigRunner.run_checks_from_yaml(
+    dataframe=dqu_main,
+    yaml_path=r"/Workspace/Users/<>/dqu_check.yml",
+    write_to_file=True,
+    df_mapping=df_mapping
+)
+
+print(results)
+### Writes results JSON in current directory
 ```
 
 ---
