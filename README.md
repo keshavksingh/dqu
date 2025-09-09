@@ -34,6 +34,7 @@ https://github.com/keshavksingh/dqu
 - [Requirements](#-requirements)
 - [Available Checks](#available-checks)
 - [Quick Start](#-quick-start)
+
   - [1. Using with Pandas](#1-using-with-pandas)
     - [1.1 Duplicate Check](#11-duplicate-check)
     - [1.2 Empty Check](#12-empty-check)
@@ -98,6 +99,11 @@ https://github.com/keshavksingh/dqu
     - [Example for Ray](#example-yaml-config-dqu_ray_checkyml)
     - [Example for Pandas](#example-for-pandas-python)
     - [Example for PySpark](#example-for-spark-pyspark)
+  - [Logging And Monitoring Integration](#-logging--monitoring-integration)
+    - [How logging works](#how-logging-works)
+    - [What Gets Logged](#what-gets-logged)
+    - [Why use loggin?](#why-use-logging)
+
 - [Notes](#-notes)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -150,6 +156,8 @@ pip install -e .
 ---
 
 ## 📋 Requirements
+
+None, make sure the desired environment has in-built support for:
 
 | Dependency   | Version   |
 | ------------ | --------- |
@@ -4161,6 +4169,62 @@ results = DquConfigRunner.run_checks_from_yaml(
 print(results)
 ### Writes results JSON in current directory
 ```
+
+---
+
+## 🌐 Logging & Monitoring Integration
+
+DQU supports **enterprise-grade logging** for your data quality results, enabling seamless integration with monitoring dashboards and alerting systems. You can log DQU results to:
+
+- **Console** (for local development and debugging)
+- **Azure Log Analytics** (for cloud-scale monitoring on Azure)
+- **Google Cloud Logging** (for GCP-native observability)
+
+### How Logging Works
+
+After running your DQU checks, simply pass the results and your chosen logger(s) to `log_dqu_results`. Each check result will be logged individually, with a computed `dqu_score` (percentage of passed rows).
+
+### Example: Logging to Console, Azure, and GCP
+
+```python
+from dqu.log.logger import log_dqu_results, ConsoleLogger, AzureLogAnalyticsLogger, GCPLogger
+
+workspaceId = "<YOUR_AZURE_WORKSPACE_ID>"
+workspaceKey = "<YOUR_AZURE_SHARED_KEY>"
+
+loggers = [
+    ConsoleLogger(),
+    AzureLogAnalyticsLogger(workspaceId, workspaceKey, "dquLogs"),
+    GCPLogger("dquLogs")
+]
+
+# results = ... # Output from DquConfigRunner.run_checks_from_yaml(..., write_to_file=False)
+
+log_dqu_results(results, loggers)
+```
+
+You can use any combination of loggers, e.g.:
+
+```python
+loggers = [GCPLogger("dquLogs")]
+```
+
+### What Gets Logged
+
+- Each check result (one log entry per check)
+- `dqu_score` field: percentage of passed rows (0 for non-success checks)
+- All metadata (run_id, timestamp, config, etc.)
+
+### Why Use Logging?
+
+- **Monitor DQ health** in real time
+- **Build dashboards** in Azure Monitor or Google Cloud Operations
+- **Set up alerts** for failed checks or low data quality scores
+
+---
+
+**Tip:**  
+You can extend logging to other platforms by implementing the `DQULoggerBase` interface.
 
 ---
 
