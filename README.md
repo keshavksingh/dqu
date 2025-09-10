@@ -2,6 +2,9 @@
 
 **Build intelligent, efficient, and trustable Data & ML Engineering Pipelines with this enterprise-ready Data Quality framework**
 
+![Dqu-29553c29-bc2e-4a2c-ad82-af5aaec66bee](https://github.com/user-attachments/assets/7fc379ae-f128-4f8d-b34d-43f3cb91b6fe)
+
+
 ---
 
 ## What is DQU?
