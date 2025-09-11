@@ -19,8 +19,11 @@ It supports:
 - **Apache Flink** for stream processing
 - **Ray Datasets** for distributed Python-native processing
 - **Spark, Pandas, Ray** through a YAML config
+- Supports YAML Driven Configuration
+- Supports (Basic and Advanced Evals), Advanced emitts Error Records Dataframe along with eval results
+- Supports Logging integrations with GCP Cloud Logging, Azure Log Analytics, Console Logs
 
-Whether you're working on Any cloud GCP, Azure or AWS or local Jupyter environment, on any of these 4 engines DQU seamlessly integrates into your data pipelines.
+Whether you're working on Any cloud GCP, Azure (Microsoft Fabric, Azure Databricks, Azure Synapse) or AWS or local Jupyter Python environment, on any of these 4 engines, DQU seamlessly integrates into your data pipelines.
 
 ---
 
