@@ -1,8 +1,11 @@
 # DQU
 
 **Build intelligent, efficient, and trustable Data & ML Engineering Pipelines with this enterprise-ready Data Quality framework**
-<img width="1080" height="1077" alt="Dqu-Clean" src="https://github.com/user-attachments/assets/e5394d0b-dcb3-4f71-a280-d856ee550a97" />
 
+
+<p align="center">
+  <img width="200" alt="Dqu-Clean" src="https://github.com/user-attachments/assets/e5394d0b-dcb3-4f71-a280-d856ee550a97" />
+</p>
 ---
 
 ## What is DQU?
