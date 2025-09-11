@@ -3,7 +3,7 @@
 **Build intelligent, efficient, and trustable Data & ML Engineering Pipelines with this enterprise-ready Data Quality framework**
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/7fc379ae-f128-4f8d-b34d-43f3cb91b6fe" alt="DQU Logo" width="200"/>
+  <img src=src="https://github.com/user-attachments/assets/da31911d-e86e-434a-a5ff-7e2745e874a5" alt="Dqu-Clean" width="1080" height="1077"/>
 </p>
 ---
 
