@@ -91,10 +91,14 @@ class ConsoleLogger(DQULoggerBase):
         except Exception as e:
             print(f"ConsoleLogger Exception: {e}")
 
-def log_dqu_results(results, loggers):
+def log_dqu_results(results, loggers, dqu_tags=None):
     """
     Logs each DQU result (with dqu_score) using the provided logger(s).
-    Only logs results with status 'Success'.
+    Args:
+        results (list[dict]): JSON string or list of DQU results.
+        loggers (list): A list of logger instances with a .log(dict) method.
+        dqu_tags (dict, optional): Additional tags to be added to each logged result.
+                                   Defaults to None.
     """
     results = json.loads(results)
     for result in results:
@@ -106,6 +110,10 @@ def log_dqu_results(results, loggers):
                     result["dqu_score"] = round((passed / total) * 100, 2) if total else 0.0
                 else:
                     result["dqu_score"] = 0.0
+                    
+                if dqu_tags:
+                    result["dqu_tags"] = dqu_tags
+
                 for logger in loggers:
                     try:
                         logger.log(result)
