@@ -2,11 +2,9 @@
 
 **Build intelligent, efficient, and trustable Data & ML Engineering Pipelines with this enterprise-ready Data Quality framework**
 
-
 <p align="center">
   <img width="200" alt="Dqu-Clean" src="https://github.com/user-attachments/assets/e5394d0b-dcb3-4f71-a280-d856ee550a97" />
 </p>
----
 
 ## What is DQU?
 
@@ -4198,6 +4196,7 @@ from dqu.log.logger import log_dqu_results, ConsoleLogger, AzureLogAnalyticsLogg
 
 workspaceId = "<YOUR_AZURE_WORKSPACE_ID>"
 workspaceKey = "<YOUR_AZURE_SHARED_KEY>"
+dqu_tags={"asset":"fghData","assetId":"6072a155-17db-4136-8d36-eb5ea73aa6c5"}
 
 loggers = [
     ConsoleLogger(),
@@ -4207,7 +4206,9 @@ loggers = [
 
 # results = ... # Output from DquConfigRunner.run_checks_from_yaml(..., write_to_file=False)
 
-log_dqu_results(results, loggers)
+log_dqu_results(results, loggers, dqu_tags)
+**dqu_tags (dict, optional): Additional tags to be added to each logged result.**
+                                   **Defaults to None.**
 ```
 
 You can use any combination of loggers, e.g.:
