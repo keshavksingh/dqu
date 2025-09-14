@@ -124,8 +124,12 @@ class DquConfigRunner:
                 # Handle func serialization for custom checks
                 if "func" in eval_config:
                     eval_config["func"] = func_str
+
                 result_dict["dqu_eval_config"] = eval_config
+                result_dict["dqu_engine"] = engine
+
                 results.append(result_dict)
+                
             except Exception as e:
                 results.append({
                     "status": "Error",
