@@ -235,9 +235,11 @@ class FlinkEngine(BaseEngine):
         status = "Success"
         if (min_rows is not None and total < min_rows) or (max_rows is not None and total > max_rows):
             status = "Failed"
+        passed = True if status =="Success" else False
         result = {
             "status": status,
             "dqu_check_type": "rowcount_check",
+            "dqu_passed": passed,
             "dqu_total_count": total,
             "min_required": min_rows,
             "max_allowed": max_rows,
