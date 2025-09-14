@@ -104,7 +104,9 @@ def log_dqu_results(results, loggers, dqu_tags=None):
     for result in results:
         try:
             if isinstance(result, dict):
-                if result.get("status") == "Success":
+                if result.get("dqu_passed") is True:
+                    result["dqu_score"] = 100.0
+                elif result.get("status") == "Success":
                     total = result.get("dqu_total_count", 0)
                     passed = result.get("dqu_passed_count", 0)
                     result["dqu_score"] = round((passed / total) * 100, 2) if total else 0.0
